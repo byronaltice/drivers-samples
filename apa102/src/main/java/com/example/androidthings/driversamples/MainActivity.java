@@ -34,12 +34,12 @@ public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     // LED configuration.
-    private static final int NUM_LEDS = 7;
+    private static final int NUM_LEDS = 100;
     private static final int LED_BRIGHTNESS = 5; // 0 ... 31
     private static final Apa102.Mode LED_MODE = Apa102.Mode.BGR;
 
     // Animation configuration.
-    private static final int FRAME_DELAY_MS = 100; // 10fps
+    private static final int FRAME_DELAY_MS = 50; // 10fps
 
     private Apa102 mLedstrip;
     private int[] mLedColors;
