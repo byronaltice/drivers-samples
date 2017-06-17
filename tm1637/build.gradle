@@ -42,13 +42,19 @@ dependencies {
 
 repositories {
     jcenter()
+    maven {
+        url 'https://maven.google.com'
+    }
 }
 
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url 'https://maven.google.com'
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-alpha3'
+        classpath 'com.android.tools.build:gradle:3.0.0-alpha4'
     }
 }
