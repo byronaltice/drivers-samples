@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     // LED configuration.
-    private static final int NUM_LEDS = 100;
+    private static final int NUM_LEDS = 180;
     private static final int LED_BRIGHTNESS = 5; // 0 ... 31
     private static final Apa102.Mode LED_MODE = Apa102.Mode.BGR;
 
