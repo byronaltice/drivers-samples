@@ -18,15 +18,24 @@ package com.example.androidthings.driversamples;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.SensorManager.DynamicSensorCallback;
 import android.os.Bundle;
+import android.text.DynamicLayout;
+import android.text.Layout;
+import android.text.TextPaint;
 import android.util.Log;
 
 import com.google.android.things.contrib.driver.bmx280.Bmx280SensorDriver;
+import com.google.android.things.contrib.driver.ssd1306.BitmapHelper;
+import com.google.android.things.contrib.driver.ssd1306.Ssd1306;
 
 import java.io.IOException;
 
@@ -38,6 +47,8 @@ public class TemperatureActivity extends Activity implements SensorEventListener
 
     private Bmx280SensorDriver mTemperatureSensorDriver;
     private SensorManager mSensorManager;
+
+    private Ssd1306 mScreen;
 
     private DynamicSensorCallback mDynamicSensorCallback = new DynamicSensorCallback() {
         @Override
@@ -59,10 +70,35 @@ public class TemperatureActivity extends Activity implements SensorEventListener
         mSensorManager.registerDynamicSensorCallback(mDynamicSensorCallback);
 
         try {
-            mTemperatureSensorDriver = new Bmx280SensorDriver(BoardDefaults.getI2CPort());
+            mTemperatureSensorDriver = new Bmx280SensorDriver(BoardDefaults.getI2CPort(), 0x76);
             mTemperatureSensorDriver.registerTemperatureSensor();
         } catch (IOException e) {
             Log.e(TAG, "Error configuring sensor", e);
+        }
+
+
+        try {
+            mScreen = new Ssd1306(BoardDefaults.getI2CPort());
+        } catch (IOException e) {
+            Log.e(TAG, "Error while opening screen", e);
+            throw new RuntimeException(e);
+        }
+    }
+    private void drawTemperature(float temperature) {
+        mScreen.clearPixels();
+        Bitmap bitmap = Bitmap.createBitmap(128, 64, Bitmap.Config.ARGB_4444);
+        Canvas canvas = new Canvas(bitmap);
+        TextPaint paint = new TextPaint();
+        paint.setColor(Color.WHITE);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextSize(10);
+        DynamicLayout dynamicLayout = new DynamicLayout("F: " + (((temperature * 9.0)/5)+32) + '\n' + "C: " + temperature, paint, 128, Layout.Alignment.ALIGN_NORMAL, 1f, 0f, false);
+        dynamicLayout.draw(canvas);
+        BitmapHelper.setBmpData(mScreen, 0, 0, bitmap, false);
+        try {
+            mScreen.show();
+        } catch (IOException e) {
+            Log.e("SSD", "Couldn't draw the screen");
         }
     }
 
@@ -87,6 +123,7 @@ public class TemperatureActivity extends Activity implements SensorEventListener
     @Override
     public void onSensorChanged(SensorEvent event) {
         Log.i(TAG, "sensor changed: " + event.values[0]);
+        drawTemperature(event.values[0]);
     }
 
     @Override
